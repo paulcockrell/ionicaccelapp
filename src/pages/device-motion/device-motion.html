@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Device Motion</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+
+  <h3>Device motion page, lets move!</h3>
+
+  <div *ngIf="pos && pos.coords">
+    <h2>Geolocation</h2>
+    <p>lat: {{pos.coords.latitude}} , lon: {{pos.coords.longitude}}</p>
+  </div>
+  <div *ngIf="acceleration">
+    <h2>Acceleration</h2>
+    <p>x: {{acceleration.x}}</p>
+    <p>y: {{acceleration.z}}</p>
+    <p>z: {{acceleration.y}}</p>
+  </div>
+
+</ion-content>
