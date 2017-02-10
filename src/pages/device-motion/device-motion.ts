@@ -13,12 +13,13 @@ export class DeviceMotionPage {
   private watchGeolocation;
   private acceleration;
   private pos;
-  private tripTypes: Array<string>;
-  private sampleRates: Array<number>;
-  private recordTimeouts: Array<number>;
-  private isRecording: Boolean;
-  private submitAttempt: Boolean = false
+  private tripTypes: Array<string> = new Array("walking", "driving");
+  private sampleRates: Array<number> = new Array(10, 20, 30);
+  private recordTimeouts: Array<number> = new Array(10, 20, 30, 40, 50, 60);
+  private isRecording: Boolean = false;
+  private submitAttempt: Boolean = false;
   private recordForm: FormGroup;
+  private timer: number = 0;
 
   constructor(
     private platform: Platform,
@@ -26,10 +27,6 @@ export class DeviceMotionPage {
     private toastCtrl: ToastController
   ) {
 
-    this.tripTypes = new Array("walking", "driving");
-    this.sampleRates = new Array(10, 20, 30);
-    this.recordTimeouts = new Array(10, 20, 30, 40, 50, 60);
-    this.isRecording = false;
     this.recordForm = formBuilder.group({
       sampleRate: ["", this.isValidSampleRate.bind(this)],
       recordTimeout: ["", this.isValidRecordTimeout.bind(this)],
@@ -55,6 +52,8 @@ export class DeviceMotionPage {
   }
 
   startRecording($event) {
+    if (this.isRecording) return;
+
     this.submitAttempt = true;
     if (!this.recordForm.valid) {
       this.isRecording = false;
@@ -67,10 +66,24 @@ export class DeviceMotionPage {
     }
     else {
       this.isRecording = true;
+      this.runTimer(this.recordForm.value.recordTimeout);
     }
   }
 
-  isValidSampleRate(control: FormControl): any {
+  runTimer(ticks: number): any {
+    this.timer = ticks;
+
+    if (ticks <= 0) {
+      this.isRecording = false; 
+      return;
+    }
+
+    setTimeout(() => {
+      this.runTimer(ticks - 1);
+    }, 1000);
+  }
+
+  private isValidSampleRate(control: FormControl): any {
     if (this.sampleRates.indexOf(control.value) < 0) {
       return {
         "Please select sample rate": true
@@ -80,7 +93,7 @@ export class DeviceMotionPage {
     return null;
   }
 
-  isValidRecordTimeout(control: FormControl): any {
+  private isValidRecordTimeout(control: FormControl): any {
     if (this.recordTimeouts.indexOf(control.value) < 0) {
       return {
         "Please select record timeout": true
@@ -90,7 +103,7 @@ export class DeviceMotionPage {
     return null;
   }
 
-  isValidTripType(control: FormControl): any {
+  private isValidTripType(control: FormControl): any {
     if (this.tripTypes.indexOf(control.value) < 0) {
       return {
         "Please select trip type": true

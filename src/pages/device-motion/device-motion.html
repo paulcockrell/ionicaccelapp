@@ -35,9 +35,9 @@
           </ion-item>
         </form>
       </ion-item-group>
-    <button ion-button full icon-left color="danger" [disabled]="isRunning" (click)="startRecording($event)">
+    <button ion-button full icon-left [color]="isRunning ? 'light' : 'danger'" [disabled]="isRunning" (click)="startRecording($event)">
       <ion-icon name="start"></ion-icon>
-      Record
+      Record {{timer}}
     </button>
   </ion-list>
   <ion-content *ngIf="isRecording" padding>
