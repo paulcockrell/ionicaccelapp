@@ -14,37 +14,43 @@ export class DeviceMotionPage {
   private acceleration;
   private pos;
   private tripTypes: Array<string>;
-  private sampleRates: Array<Number>;
-  private recordTimeouts: Array<Number>;
+  private sampleRates: Array<number>;
+  private recordTimeouts: Array<number>;
   private isRecording: Boolean;
   private submitAttempt: Boolean = false
   private recordForm: FormGroup;
 
-  constructor(private platform: Platform, public formBuilder: FormBuilder, private toastCtrl: ToastController) {
+  constructor(
+    private platform: Platform,
+    public formBuilder: FormBuilder,
+    private toastCtrl: ToastController
+  ) {
 
     this.tripTypes = new Array("walking", "driving");
     this.sampleRates = new Array(10, 20, 30);
     this.recordTimeouts = new Array(10, 20, 30, 40, 50, 60);
     this.isRecording = false;
     this.recordForm = formBuilder.group({
-      sampleRate: ["", this.isValidSampleRate],
-      recordTimeout: ["", this.isValidRecordTimeout],
-      tripType: ["", this.isValidTripType]
+      sampleRate: ["", this.isValidSampleRate.bind(this)],
+      recordTimeout: ["", this.isValidRecordTimeout.bind(this)],
+      tripType: ["", this.isValidTripType.bind(this)]
     });
 
-    platform.ready().then(() => {
-      this.watchGeolocation = Geolocation
-        .watchPosition()
-        .subscribe((pos) => {
-          this.pos = pos;
-        });
+    platform
+      .ready()
+      .then(() => {
+        this.watchGeolocation = Geolocation
+          .watchPosition()
+          .subscribe((pos) => {
+            this.pos = pos;
+          });
 
-      this.watchAcceleration = DeviceMotion
-        .watchAcceleration({frequency: 200})
-        .subscribe((acceleration) => {
-          this.acceleration = acceleration;
+        this.watchAcceleration = DeviceMotion
+          .watchAcceleration({frequency: 200})
+          .subscribe((acceleration) => {
+            this.acceleration = acceleration;
+          });
         });
-    });
 
   }
 
@@ -65,8 +71,7 @@ export class DeviceMotionPage {
   }
 
   isValidSampleRate(control: FormControl): any {
-    console.log("err hello?", this.sampleRates);
-    if (this.sampleRates.indexOf(control.value) > -1) {
+    if (this.sampleRates.indexOf(control.value) < 0) {
       return {
         "Please select sample rate": true
       }
@@ -76,7 +81,7 @@ export class DeviceMotionPage {
   }
 
   isValidRecordTimeout(control: FormControl): any {
-    if (this.recordTimeouts.indexOf(control.value) > -1) {
+    if (this.recordTimeouts.indexOf(control.value) < 0) {
       return {
         "Please select record timeout": true
       }
@@ -86,7 +91,7 @@ export class DeviceMotionPage {
   }
 
   isValidTripType(control: FormControl): any {
-            if (this.tripTypes.indexOf(control.value) > -1) {
+    if (this.tripTypes.indexOf(control.value) < 0) {
       return {
         "Please select trip type": true
       }
