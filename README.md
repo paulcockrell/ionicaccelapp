@@ -18,3 +18,14 @@ ionic state save
 
 # Integration AWS IOT
 see the following git repo: https://github.com/vbudilov/aws-cognito-ionic2
+
+# Run application
+```
+ionic run android --device
+```
+
+# List devices connected to machine
+To see which mobile devices are available to deploy to from your host machine
+```
+adb devices
+```
