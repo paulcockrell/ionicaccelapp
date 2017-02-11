@@ -1,3 +1,18 @@
+# Cloning this repo:
+```
+git clone ssh://git@bitbucket.org/paulcockrell/ionicaccelapp.git
+```
+
+# Install
+```
+cd <path/to/app>
+npm install
+npm install -g typings
+typings install dt~cordova --save --global 
+typings install dt~cordova/plugins/filesystem --save  --global
+ionic platform add android
+```
+
 # Debugging
 
 To debug application running on a device open Chrome and navigate to

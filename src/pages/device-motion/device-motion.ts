@@ -3,6 +3,14 @@ import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
 import { Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from 'ionic-native';
 import { DeviceMotion } from 'ionic-native';
+import { File } from 'ionic-native';
+
+declare var cordova: any;
+
+export interface IDataObj {
+  pos: any,
+  acceleration: any
+}
 
 @Component({
   selector: 'page-device-motion',
@@ -20,11 +28,13 @@ export class DeviceMotionPage {
   private submitAttempt: Boolean = false;
   private recordForm: FormGroup;
   private timer: number = 0;
+  private fs:string = cordova.file.dataDirectory;
+  private logWriterInterval: any;
 
   constructor(
     private platform: Platform,
     public formBuilder: FormBuilder,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
   ) {
 
     this.recordForm = formBuilder.group({
@@ -47,11 +57,34 @@ export class DeviceMotionPage {
           .subscribe((acceleration) => {
             this.acceleration = acceleration;
           });
-        });
+      });
 
   }
 
-  startRecording($event) {
+  removeCsv(): void {
+    File
+      .removeFile(this.fs, 'afile.csv')
+      .then(_ => {})
+      .catch((err) => {
+        console.log("Failed to remove file", err);
+      });
+  }
+
+  readCsv(cb: any): void {
+    File.readAsText(this.fs, 'afile.csv')
+      .then(
+        (data) => {
+          cb(data);
+        }
+      ).catch(
+        (err) => {
+          console.log("Problem reading file:", err);
+          cb(null);
+        }
+      );
+  }
+
+  startRecording($event): void {
     if (this.isRecording) return;
 
     this.submitAttempt = true;
@@ -67,14 +100,27 @@ export class DeviceMotionPage {
     else {
       this.isRecording = true;
       this.runTimer(this.recordForm.value.recordTimeout);
+      this.logWriterInterval = setInterval(_ => {
+        this.writeToCsv();
+      }, 1000);
     }
   }
 
-  runTimer(ticks: number): any {
+  runTimer(ticks: number): void {
     this.timer = ticks;
 
     if (ticks <= 0) {
       this.isRecording = false; 
+      clearInterval(this.logWriterInterval); 
+      this.readCsv((data) => {
+        console.log("File data:", data);
+      });
+      let toast = this.toastCtrl.create({
+        message: "Trip recording completed",
+        duration: 3000,
+        position: "top"
+      });
+      toast.present();
       return;
     }
 
@@ -111,6 +157,33 @@ export class DeviceMotionPage {
     }
 
     return null;
+  }
+
+  private writeToCsv(): void {
+    let data = this.pos.coords.latitude + "," + this.pos.coords.longitude + "," + this.acceleration.x + "," + this.acceleration.y + "," + this.acceleration.z + "\n";
+
+    File.writeFile(this.fs, 'afile.csv', data, {append: true})
+      .then(
+        _ => {
+          console.log("Written to log");
+        }
+      ).catch(
+        (err) => {
+          if (err.code == 1) // NOT_FOUND_ERR
+            File.writeFile(this.fs, 'afile.csv', data)
+              .then(
+                _ => {
+                  console.log("Created and written to log");
+                }
+              ).catch(
+                (err) => {
+                  console.log("Error creating file", err);
+                }
+              );
+          else
+            console.log("Error creating file", err);
+        }
+      );
   }
 
   ngOnDestroy() {

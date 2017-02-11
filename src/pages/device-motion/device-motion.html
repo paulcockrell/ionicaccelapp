@@ -37,7 +37,8 @@
       </ion-item-group>
     <button ion-button full icon-left [color]="isRunning ? 'light' : 'danger'" [disabled]="isRunning" (click)="startRecording($event)">
       <ion-icon name="start"></ion-icon>
-      Record {{timer}}
+      <div *ngIf="isRecording">Recording [{{timer}}]</div>
+      <div *ngIf="!isRecording">Record</div>
     </button>
   </ion-list>
   <ion-content *ngIf="isRecording" padding>

@@ -32,15 +32,16 @@
     "typescript": "2.0.9"
   },
   "cordovaPlugins": [
+    "ionic-plugin-keyboard",
     "cordova-plugin-whitelist",
     "cordova-plugin-console",
     "cordova-plugin-statusbar",
     "cordova-plugin-device",
     "cordova-plugin-splashscreen",
-    "ionic-plugin-keyboard",
     "cordova-plugin-device-motion",
     "cordova-plugin-geolocation",
-    "cordova-plugin-compat"
+    "cordova-plugin-compat",
+    "cordova-plugin-file"
   ],
   "cordovaPlatforms": [
     {
