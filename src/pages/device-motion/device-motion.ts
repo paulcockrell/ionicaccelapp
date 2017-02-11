@@ -30,6 +30,7 @@ export class DeviceMotionPage {
   private timer: number = 0;
   private fs:string = cordova.file.dataDirectory;
   private logWriterInterval: any;
+  private fileName: string;
 
   constructor(
     private platform: Platform,
@@ -57,13 +58,14 @@ export class DeviceMotionPage {
           .subscribe((acceleration) => {
             this.acceleration = acceleration;
           });
+        this.removeCsv();
       });
 
   }
 
   removeCsv(): void {
     File
-      .removeFile(this.fs, 'afile.csv')
+      .removeFile(this.fs, "afile.csv")
       .then(_ => {})
       .catch((err) => {
         console.log("Failed to remove file", err);
@@ -71,7 +73,7 @@ export class DeviceMotionPage {
   }
 
   readCsv(cb: any): void {
-    File.readAsText(this.fs, 'afile.csv')
+    File.readAsText(this.fs, this.fileName)
       .then(
         (data) => {
           cb(data);
@@ -98,12 +100,22 @@ export class DeviceMotionPage {
       toast.present();
     }
     else {
+      let recordTimeout = this.recordForm.value.recordTimeout;
+      let sampleRate = this.recordForm.value.sampleRate;
+
       this.isRecording = true;
-      this.runTimer(this.recordForm.value.recordTimeout);
+      this.fileName = this.generateFileName();
+      console.log("Recording to: " + this.fs + "/" + this.fileName);
+      this.runTimer(recordTimeout);
       this.logWriterInterval = setInterval(_ => {
         this.writeToCsv();
-      }, 1000);
+      }, sampleRate);
     }
+  }
+
+  private generateFileName(): string {
+    let tripType = this.recordForm.value.tripType;
+    return tripType + "-" + Date.now() + ".csv";
   }
 
   runTimer(ticks: number): void {
@@ -162,15 +174,22 @@ export class DeviceMotionPage {
   private writeToCsv(): void {
     let data = this.pos.coords.latitude + "," + this.pos.coords.longitude + "," + this.acceleration.x + "," + this.acceleration.y + "," + this.acceleration.z + "\n";
 
-    File.writeFile(this.fs, 'afile.csv', data, {append: true})
+    File.writeFile(this.fs, this.fileName, data, {append: true})
       .then(
         _ => {
           console.log("Written to log");
         }
       ).catch(
         (err) => {
-          if (err.code == 1) // NOT_FOUND_ERR
-            File.writeFile(this.fs, 'afile.csv', data)
+          if (err.code == 1) {// NOT_FOUND_ERR
+            let header = 
+              "# Trip type: " + this.recordForm.value.tripType + 
+              "\n# Sample rate: " + this.recordForm.value.sampleRate + 
+              "\n# Record time (s): " + this.recordForm.value.recordTimeout +
+              "\n# latitue, longitude, accelx, accely, accelz" +
+              "\n" + data;
+
+            File.writeFile(this.fs, this.fileName, header)
               .then(
                 _ => {
                   console.log("Created and written to log");
@@ -180,6 +199,7 @@ export class DeviceMotionPage {
                   console.log("Error creating file", err);
                 }
               );
+          }
           else
             console.log("Error creating file", err);
         }
