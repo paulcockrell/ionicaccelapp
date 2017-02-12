@@ -1,7 +1,7 @@
 {
-  "name": "aws-cognito-ionic2",
-  "author": "Vladimir Budilov",
-  "homepage": "http://budilov.com/",
+  "name": "ionic-accel-app",
+  "author": "Paul Cockrell",
+  "homepage": "http://hubio.com/",
   "private": true,
   "scripts": {
     "build": "ionic-app-scripts build",
