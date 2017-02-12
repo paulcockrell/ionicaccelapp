@@ -1,46 +1,45 @@
-# Cloning this repo:
-```
-git clone ssh://git@bitbucket.org/paulcockrell/ionicaccelapp.git
-```
+##AWS Cognito with Ionic2 Quickstart
 
-# Install
+### Updates
+10/14 -- Updated to Angular Final/Ionic RC0
+
+### What does this app do?
+Quickly start using AWS Cognito and Ionic2
+
+### Tech Stack
+#### Required Tools
+* [npm](https://www.npmjs.com/)
+
+#### Frameworks
+* [AWS JavaScript SDK](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/browser-intro.html)
+* [Angular 2](https://angular.io/docs/ts/latest/quickstart.html) 
+* [(Ionic)](http://ionicframework.com/docs/v2/getting-started/installation/)
+* [TypeScript](https://www.typescriptlang.org/docs/tutorial.html)
+
+### Getting the code
 ```
-cd <path/to/app>
+# Clone it from github
+git clone --depth 1 git@github.com:vbudilov/aws-cognito-ionic2.git
+```
+```
+# Install the NPM and Bower packages
 npm install
-npm install -g typings
-typings install dt~cordova --save --global 
-typings install dt~cordova/plugins/filesystem --save  --global
-ionic platform add android
+```
+```
+# Build & Run the app in dev mode
+ionic build; ionic serve
 ```
 
-# Debugging
+### AWS Setup
+You will need to create the user pool manually through the console. 
 
-To debug application running on a device open Chrome and navigate to
-```
-chrome://inspect/#device
-```
-You can select the device to inspec from the list using regular chrome debug tools
+1. Create User pool first, when creating the app for the pool DO NOT check "Generate client secret" It
+does not work with the JavaScript SDK.
 
-# Installing plugins
+2. Create a federated Identity, and "Edit identity pool", under "Authentication providers" complete
+the "Cognito" entry with your app details generated in step 1.
 
-This installs and also updates the package.json file. You must have already
-installed your target builds (i.e android)
+### Necessary changes
+By default, this app is using my user pool, which is defined in the ```app/services/properties.service.ts``` file. 
+Update the file with the appropriate user pool info that you want to use 
 
-```
-ionic plugin add cordova-plugin-geolocation --save
-ionic state save
-```
-
-# Integration AWS IOT
-see the following git repo: https://github.com/vbudilov/aws-cognito-ionic2
-
-# Run application
-```
-ionic run android --device
-```
-
-# List devices connected to machine
-To see which mobile devices are available to deploy to from your host machine
-```
-adb devices
-```

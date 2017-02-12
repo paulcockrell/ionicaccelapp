@@ -1,47 +1,48 @@
 {
-  "name": "ionic-hello-world",
-  "author": "Ionic Framework",
-  "homepage": "http://ionicframework.com/",
+  "name": "aws-cognito-ionic2",
+  "author": "Vladimir Budilov",
+  "homepage": "http://budilov.com/",
   "private": true,
   "scripts": {
-    "clean": "ionic-app-scripts clean",
     "build": "ionic-app-scripts build",
-    "ionic:build": "ionic-app-scripts build",
-    "ionic:serve": "ionic-app-scripts serve"
+    "watch": "ionic-app-scripts watch",
+    "serve:before": "watch",
+    "emulate:before": "build",
+    "deploy:before": "build",
+    "build:before": "build",
+    "run:before": "build"
   },
   "dependencies": {
-    "@angular/common": "2.2.1",
-    "@angular/compiler": "2.2.1",
-    "@angular/compiler-cli": "2.2.1",
-    "@angular/core": "2.2.1",
-    "@angular/forms": "2.2.1",
-    "@angular/http": "2.2.1",
-    "@angular/platform-browser": "2.2.1",
-    "@angular/platform-browser-dynamic": "2.2.1",
-    "@angular/platform-server": "2.2.1",
-    "@ionic/storage": "1.1.7",
-    "ionic-angular": "2.0.1",
-    "ionic-native": "2.4.1",
+    "@angular/common": "2.1.1",
+    "@angular/compiler": "2.1.1",
+    "@angular/compiler-cli": "2.1.1",
+    "@angular/core": "2.1.1",
+    "@angular/forms": "2.1.1",
+    "@angular/http": "2.1.1",
+    "@angular/platform-browser": "2.1.1",
+    "@angular/platform-browser-dynamic": "2.1.1",
+    "@angular/platform-server": "2.1.1",
+    "@ionic/storage": "1.1.6",
+    "ionic-angular": "2.0.0-rc.2",
+    "ionic-native": "2.2.3",
     "ionicons": "3.0.0",
     "rxjs": "5.0.0-beta.12",
-    "sw-toolbox": "3.4.0",
-    "zone.js": "0.6.26"
+    "zone.js": "0.6.21"
   },
   "devDependencies": {
-    "@ionic/app-scripts": "1.0.0",
-    "aws-sdk-typescript": "0.0.3",
-    "typescript": "2.0.9"
+    "@ionic/app-scripts": "0.0.39",
+    "typescript": "2.0.6"
   },
+  "description": "Sample ionic2 app",
   "cordovaPlugins": [
-    "ionic-plugin-keyboard",
+    "cordova-plugin-device",
+    "cordova-plugin-statusbar",
     "cordova-plugin-whitelist",
     "cordova-plugin-console",
-    "cordova-plugin-statusbar",
-    "cordova-plugin-device",
-    "cordova-plugin-splashscreen",
-    "cordova-plugin-device-motion",
+    "ionic-plugin-keyboard",
     "cordova-plugin-geolocation",
     "cordova-plugin-compat",
+    "cordova-plugin-device-motion",
     "cordova-plugin-file"
   ],
   "cordovaPlatforms": [
@@ -50,6 +51,5 @@
       "version": "",
       "locator": "android"
     }
-  ],
-  "description": "MyIonic2Project: An Ionic project"
+  ]
 }

@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from 'ionic-native';
 import { DeviceMotion } from 'ionic-native';
 import { File } from 'ionic-native';
+import {AwsUtil} from "../../providers/aws.service";
 
 declare var cordova: any;
 
@@ -17,25 +18,26 @@ export interface IDataObj {
   templateUrl: 'device-motion.html'
 })
 export class DeviceMotionPage {
-  private watchAcceleration;
-  private watchGeolocation;
-  private acceleration;
-  private pos;
-  private tripTypes: Array<string> = new Array("walking", "driving");
-  private sampleRates: Array<number> = new Array(10, 20, 30);
-  private recordTimeouts: Array<number> = new Array(10, 20, 30, 40, 50, 60);
-  private isRecording: Boolean = false;
-  private submitAttempt: Boolean = false;
-  private recordForm: FormGroup;
-  private timer: number = 0;
-  private fs:string = cordova.file.dataDirectory;
-  private logWriterInterval: any;
-  private fileName: string;
+  watchAcceleration;
+  watchGeolocation;
+  acceleration;
+  pos;
+  tripTypes: Array<string> = new Array("walking", "driving", "stationary");
+  sampleRates: Array<number> = new Array(10, 20, 30);
+  recordTimeouts: Array<number> = new Array(10, 20, 30, 40, 50, 60);
+  isRecording: Boolean = false;
+  submitAttempt: Boolean = false;
+  recordForm: FormGroup;
+  timer: number = 0;
+  fs:string = cordova.file.dataDirectory;
+  logWriterInterval: any;
+  fileName: string;
 
   constructor(
     private platform: Platform,
     public formBuilder: FormBuilder,
     private toastCtrl: ToastController,
+    public awsUtil: AwsUtil
   ) {
 
     this.recordForm = formBuilder.group({
@@ -125,7 +127,8 @@ export class DeviceMotionPage {
       this.isRecording = false; 
       clearInterval(this.logWriterInterval); 
       this.readCsv((data) => {
-        console.log("File data:", data);
+        let tripType = this.recordForm.value.tripType;
+        this.awsUtil.uploadFile(tripType, data);
       });
       let toast = this.toastCtrl.create({
         message: "Trip recording completed",
@@ -189,7 +192,7 @@ export class DeviceMotionPage {
               "\n# latitue, longitude, accelx, accely, accelz" +
               "\n" + data;
 
-            File.writeFile(this.fs, this.fileName, header)
+            File.writeFile(this.fs, this.fileName, header, {append: false})
               .then(
                 _ => {
                   console.log("Created and written to log");

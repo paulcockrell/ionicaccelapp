@@ -1,18 +1,39 @@
-import { NgModule, ErrorHandler } from '@angular/core';
-import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { MyApp } from './app.component';
-import { HelloIonicPage } from '../pages/hello-ionic/hello-ionic';
-import { ItemDetailsPage } from '../pages/item-details/item-details';
-import { ListPage } from '../pages/list/list';
+import {NgModule} from "@angular/core";
+import {IonicApp, IonicModule} from "ionic-angular";
+import {MyApp} from "./app.component";
+import {
+  CognitoUtil,
+  UserLoginService,
+  UserParametersService,
+  UserRegistrationService
+} from "../providers/cognito.service";
+import {AwsUtil} from "../providers/aws.service";
+import {
+  LoginComponent,
+  LogoutComponent,
+  RegisterComponent,
+  ConfirmRegistrationComponent,
+  ResendCodeComponent,
+  ForgotPasswordStep1Component,
+  ForgotPasswordStep2Component
+} from "../pages/auth/auth";
+import {ControlPanelComponent} from "../pages/controlpanel/controlpanel";
+import {Storage} from "@ionic/storage";
 import { DeviceMotionPage } from '../pages/device-motion/device-motion';
+import {EventsService} from "../providers/events.service";
 
 @NgModule({
   declarations: [
     MyApp,
-    HelloIonicPage,
-    ItemDetailsPage,
-    ListPage,
-    DeviceMotionPage
+    LoginComponent,
+    LogoutComponent,
+    RegisterComponent,
+    ConfirmRegistrationComponent,
+    ResendCodeComponent,
+    ForgotPasswordStep1Component,
+    ForgotPasswordStep2Component,
+    DeviceMotionPage,
+    ControlPanelComponent
   ],
   imports: [
     IonicModule.forRoot(MyApp)
@@ -20,11 +41,24 @@ import { DeviceMotionPage } from '../pages/device-motion/device-motion';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HelloIonicPage,
-    ItemDetailsPage,
-    ListPage,
-    DeviceMotionPage
+    LoginComponent,
+    LogoutComponent,
+    RegisterComponent,
+    ConfirmRegistrationComponent,
+    ResendCodeComponent,
+    ForgotPasswordStep1Component,
+    ForgotPasswordStep2Component,
+    DeviceMotionPage,
+    ControlPanelComponent
   ],
-  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}]
+  providers: [CognitoUtil,
+    AwsUtil,
+    UserLoginService,
+    UserParametersService,
+    UserRegistrationService,
+    Storage,
+    EventsService]
 })
-export class AppModule {}
+
+export class AppModule {
+}
