@@ -102,7 +102,7 @@ export class AwsUtil {
     return params;
   }
 
-  uploadFile(file_prefix: string, data: string): void {
+  uploadFile(file_prefix: string, data: string, cb: any): void {
     console.log("in uploadFile()");
     let bucketName = _S3_BUCKET_NAME;
     let remoteFileName = file_prefix + "-" + Date.now() + ".csv";
@@ -113,7 +113,10 @@ export class AwsUtil {
 
     s3.upload({Body: data, Key: remoteFileName}, (err, data) => {
       if(err) console.log("S3 upload error", err);
-      else console.log("S3 upload complete");
+      else {
+        console.log("S3 upload complete");
+        cb();
+      }
     });
   }
 

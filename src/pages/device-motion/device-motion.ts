@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { Platform, ToastController } from 'ionic-angular';
-import { File } from 'ionic-native';
 import { AwsUtil } from "../../providers/aws.service";
-import { Sensors } from "../../providers/sensors.service";
+import { Sensors, IDataObj } from "../../providers/sensors.service";
 
 declare var cordova: any;
 
@@ -19,10 +18,9 @@ export class DeviceMotionPage {
   submitAttempt: Boolean = false;
   recordForm: FormGroup;
   timer: number = 0;
-  fs:string = cordova.file.dataDirectory;
   logWriterInterval: any;
-  fileName: string;
   ready: Boolean = false;
+  data: Array<string> = new Array();
 
   constructor(
     private platform: Platform,
@@ -47,29 +45,6 @@ export class DeviceMotionPage {
         sensors.startGeolocation();
       });
 
-  }
-
-  removeCsv(): void {
-    File
-      .removeFile(this.fs, "afile.csv")
-      .then(_ => {})
-      .catch((err) => {
-        console.log("Failed to remove file", err);
-      });
-  }
-
-  readCsv(cb: any): void {
-    File.readAsText(this.fs, this.fileName)
-      .then(
-        (data) => {
-          cb(data);
-        }
-      ).catch(
-        (err) => {
-          console.log("Problem reading file:", err);
-          cb(null);
-        }
-      );
   }
 
   startRecording($event): void {
@@ -109,32 +84,40 @@ export class DeviceMotionPage {
     this.sensors.startCompass(sampleRate);
 
     this.isRecording = true;
-    this.fileName = this.generateFileName();
-    console.log("Recording to: " + this.fs + "/" + this.fileName);
+    this.data.push(this.generateHeader());
 
-    this.createLog((err) => {
-      if (err) {
-        this.isRecording = false;
-        let toast = this.toastCtrl.create({
-          message: "Failed to create log file",
-          duration: 3000,
-          position: "top"
-        });
-        toast.present();
-         
-        return;
-      }
-      
+    // Sensor warmup pause
+    setTimeout(() => {
       this.runTimer(recordTimeout);
       this.logWriterInterval = setInterval(_ => {
-        this.writeLog();
+        if (!this.isRecording) return;
+
+        let sensor_data = this.sensors.data();
+        let csv_data = this.sensorDataToCsv(sensor_data);
+        this.data.push(csv_data);
       }, sampleRate);
-    })
+    }, 1000);
   }
 
-  private generateFileName(): string {
-    let tripType = this.recordForm.value.tripType;
-    return tripType + "-" + Date.now() + ".csv";
+  private sensorDataToCsv(data: IDataObj): string {
+    let csv_data = 
+      this.recordForm.value.tripType + ", " +
+      Date.now() + "," +
+      data.geolocation.coords.latitude + "," + 
+      data.geolocation.coords.longitude + "," +
+      data.geolocation.coords.altitude + "," +
+      data.geolocation.coords.accuracy + "," +
+      data.geolocation.coords.altitudeAccuracy + "," +
+      data.geolocation.coords.heading + "," +
+      data.geolocation.coords.speed + "," +
+      data.acceleration.x + "," +
+      data.acceleration.y + "," +
+      data.acceleration.z + "," +
+      data.compass.magneticHeading + "," +
+      data.compass.trueHeading + "," +
+      data.compass.headingAccuracy + "\n";
+
+    return csv_data;
   }
 
   runTimer(ticks: number): void {
@@ -147,22 +130,37 @@ export class DeviceMotionPage {
       this.sensors.stopAcceleration();
       this.sensors.stopCompass();
 
-      this.readCsv((data) => {
-        let tripType = this.recordForm.value.tripType;
-        this.awsUtil.uploadFile(tripType, data);
+      this.awsUtil.uploadFile(this.recordForm.value.tripType, this.data.join(""), () => {
+        this.showToast("File uploaded to S3");
       });
-      let toast = this.toastCtrl.create({
-        message: "Trip recording completed",
-        duration: 3000,
-        position: "top"
-      });
-      toast.present();
-      return;
     }
+    else {
+      setTimeout(() => {
+        this.runTimer(ticks - 1);
+      }, 1000);
+    }
+  }
 
-    setTimeout(() => {
-      this.runTimer(ticks - 1);
-    }, 1000);
+  private showToast(message: string): void {
+    let toast = this.toastCtrl.create({
+      message: message,
+      duration: 3000,
+      position: "top"
+    });
+    toast.present();
+  }
+
+  private generateHeader(): string {
+    let header = 
+      "# Trip type (0: walking, 1: driving, 2: stationairy): " + this.recordForm.value.tripType + 
+      "\n# Sample rate: " + this.recordForm.value.sampleRate + 
+      "\n# Record time (s): " + this.recordForm.value.recordTimeout +
+      "\ntriptype, timestamp, latitue, longitude, altitude, accuracy " +
+      "altitude accuracy, heading, speed, accelx, accely, accelz, " +
+      "magnetic heading, true heading, heading accuracy" +
+      "\n";
+
+    return header;
   }
 
   private isValidSampleRate(control: FormControl): any {
@@ -198,67 +196,6 @@ export class DeviceMotionPage {
     }
 
     return null;
-  }
-
-  private createLog(cb: any): void {
-    let header = 
-      "# Trip type (0: walking, 1: driving, 2: stationairy): " + this.recordForm.value.tripType + 
-      "\n# Sample rate: " + this.recordForm.value.sampleRate + 
-      "\n# Record time (s): " + this.recordForm.value.recordTimeout +
-      "\n# triptype, timestamp, latitue, longitude, altitude, accuracy " +
-      "altitude accuracy, heading, speed, accelx, accely, accelz, " +
-      "magnetic heading, true heading, heading accuracty\n";
-
-    File.createFile(this.fs, this.fileName, true)
-      .then(
-        (fe) => {
-          File.writeFile(this.fs, this.fileName, header, {append: true})
-            .then(_ => cb(null))
-            .catch(
-              (err) => {
-                console.log("Failed to write header to log");
-                cb(err);
-              }
-            );
-        }
-      )
-      .catch(
-        (err) => {
-          console.log("Failed to create log file");
-          cb(err);
-      });
-  }
-
-  private writeLog(): void {
-    let sensor_data = this.sensors.data();
-    if (!sensor_data) return;
-
-    let data = this.recordForm.value.tripType + ", " +
-               Date.now() + "," +
-               sensor_data.geolocation.coords.latitude + "," + 
-               sensor_data.geolocation.coords.longitude + "," +
-               sensor_data.geolocation.coords.altitude + "," +
-               sensor_data.geolocation.coords.accuracy + "," +
-               sensor_data.geolocation.coords.altitudeAccuracy + "," +
-               sensor_data.geolocation.coords.heading + "," +
-               sensor_data.geolocation.coords.speed + "," +
-               sensor_data.acceleration.x + "," +
-               sensor_data.acceleration.y + "," +
-               sensor_data.acceleration.z + "," +
-               sensor_data.compass.magneticHeading + "," +
-               sensor_data.compass.trueHeading + "," +
-               sensor_data.compass.headingAccuracy + "\n";
-
-    File.writeFile(this.fs, this.fileName, data, {append: true})
-      .then(
-        _ => {
-          console.log("Written to log");
-        }
-      ).catch(
-        (err) => {
-          console.log("Error writting to log", err);
-        }
-      );
   }
 
   ngOnDestroy() {
