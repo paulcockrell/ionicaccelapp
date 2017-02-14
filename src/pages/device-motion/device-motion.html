@@ -18,7 +18,7 @@
           <ion-item>
             <ion-label>Trip type</ion-label>
             <ion-select formControlName="tripType">
-              <ion-option *ngFor="let type of tripTypes" [value]="type">{{type}}</ion-option>
+              <ion-option *ngFor="let type of tripTypes" [value]="type.id">{{type.name}}</ion-option>
             </ion-select>
           </ion-item>
           <ion-item>

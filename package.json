@@ -43,7 +43,8 @@
     "cordova-plugin-geolocation",
     "cordova-plugin-compat",
     "cordova-plugin-device-motion",
-    "cordova-plugin-file"
+    "cordova-plugin-file",
+    "cordova-plugin-device-orientation"
   ],
   "cordovaPlatforms": [
     {

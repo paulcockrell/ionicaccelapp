@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {CognitoUtil, UserLoginService} from "./cognito.service";
-import {_REGION, _IDENTITY_POOL_ID, _USER_POOL_ID, _MOBILE_ANALYTICS_APP_ID} from "./properties.service";
+import {_REGION, _IDENTITY_POOL_ID, _USER_POOL_ID, _MOBILE_ANALYTICS_APP_ID, _S3_BUCKET_NAME} from "./properties.service";
 
 declare var AWS;
 declare var AWSCognito:any;
@@ -104,7 +104,7 @@ export class AwsUtil {
 
   uploadFile(file_prefix: string, data: string): void {
     console.log("in uploadFile()");
-    let bucketName = "ionic-accel-app-machine-learning-data";
+    let bucketName = _S3_BUCKET_NAME;
     let remoteFileName = file_prefix + "-" + Date.now() + ".csv";
     let s3 = new AWS.S3({
       apiVersion: '2006-03-01',
