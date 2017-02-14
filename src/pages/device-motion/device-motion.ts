@@ -1,30 +1,17 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { Platform, ToastController } from 'ionic-angular';
-import { Geolocation } from 'ionic-native';
-import { DeviceMotion, AccelerationData } from 'ionic-native';
-import { DeviceOrientation, CompassHeading } from 'ionic-native';
 import { File } from 'ionic-native';
-import {AwsUtil} from "../../providers/aws.service";
+import { AwsUtil } from "../../providers/aws.service";
+import { Sensors } from "../../providers/sensors.service";
 
 declare var cordova: any;
-
-export interface IDataObj {
-  pos: any,
-  acceleration: any
-}
 
 @Component({
   selector: 'page-device-motion',
   templateUrl: 'device-motion.html'
 })
 export class DeviceMotionPage {
-  watchAcceleration: any;
-  watchGeolocation: any;
-  watchCompass: any;
-  acceleration: AccelerationData;
-  compass: CompassHeading;
-  pos;
   tripTypes: Array<Object> = new Array({id: 0, name: 'walking'}, {id: 1, name: 'driving'}, {id: 2, name: 'stationary'});
   sampleRates: Array<number> = new Array(10, 20, 30);
   recordTimeouts: Array<number> = new Array(10, 20, 30, 40, 50, 60);
@@ -41,7 +28,8 @@ export class DeviceMotionPage {
     private platform: Platform,
     public formBuilder: FormBuilder,
     private toastCtrl: ToastController,
-    public awsUtil: AwsUtil
+    public awsUtil: AwsUtil,
+    private sensors: Sensors
   ) {
 
     this.recordForm = formBuilder.group({
@@ -53,60 +41,12 @@ export class DeviceMotionPage {
     platform
       .ready()
       .then(() => {
-        // Sensors will be ready
+        // Device sensors will be ready
         this.ready = true;
         // Geolocation doesn't work on a frequency, but rather location change event
-        this.watchGeolocation = this.startGeolocation();
+        sensors.startGeolocation();
       });
 
-  }
-
-  startGeolocation(): any {
-    if (this.ready != true) return;
-
-    let sub = Geolocation
-      .watchPosition({ maximumAge: 3000, timeout: 5000, enableHighAccuracy: true })
-      .subscribe((pos) => {
-        this.pos = pos;
-      });
-
-    return sub;
-  }
-
-  stopGeolocation(subscription: any): void {
-    subscription.unsubscribe();
-  }
-
-  startCompass(frequency: number): any {
-    if (this.ready != true) return;
-
-    let sub = DeviceOrientation
-      .watchHeading({frequency: frequency})
-      .subscribe((data: CompassHeading) => {
-        this.compass = data;
-      });
-
-    return sub;
-  }
-
-  stopCompass(subscription: any): void {
-    subscription.unsubscribe();
-  }
-
-  startAcceleration(frequency: number): any {
-    if (this.ready != true) return;
-
-    let sub = DeviceMotion
-      .watchAcceleration({frequency: frequency})
-      .subscribe((acceleration: AccelerationData) => {
-        this.acceleration = acceleration;
-      });
-
-    return sub; 
-  }
-
-  stopAcceleration(subscription: any): void {
-    subscription.unsubscribe();
   }
 
   removeCsv(): void {
@@ -149,7 +89,8 @@ export class DeviceMotionPage {
       return;
     }
 
-    if (!this.pos && !this.pos.coords) {
+    let sensor_data = this.sensors.data();
+    if (!sensor_data.geolocation && !sensor_data.geolocation.coords) {
       this.isRecording = false;
       let toast = this.toastCtrl.create({
         message: "Waiting for geolocation lock",
@@ -164,8 +105,8 @@ export class DeviceMotionPage {
     let recordTimeout = this.recordForm.value.recordTimeout;
     let sampleRate = this.recordForm.value.sampleRate;
 
-    this.watchAcceleration = this.startAcceleration(sampleRate);
-    this.watchCompass = this.startCompass(sampleRate);
+    this.sensors.startAcceleration(sampleRate);
+    this.sensors.startCompass(sampleRate);
 
     this.isRecording = true;
     this.fileName = this.generateFileName();
@@ -203,8 +144,8 @@ export class DeviceMotionPage {
       this.isRecording = false; 
       clearInterval(this.logWriterInterval); 
 
-      this.stopAcceleration(this.watchAcceleration);
-      this.stopCompass(this.watchCompass);
+      this.sensors.stopAcceleration();
+      this.sensors.stopCompass();
 
       this.readCsv((data) => {
         let tripType = this.recordForm.value.tripType;
@@ -264,7 +205,7 @@ export class DeviceMotionPage {
       "# Trip type (0: walking, 1: driving, 2: stationairy): " + this.recordForm.value.tripType + 
       "\n# Sample rate: " + this.recordForm.value.sampleRate + 
       "\n# Record time (s): " + this.recordForm.value.recordTimeout +
-      "\n# triptype, latitue, longitude, altitude, accuracy " +
+      "\n# triptype, timestamp, latitue, longitude, altitude, accuracy " +
       "altitude accuracy, heading, speed, accelx, accely, accelz, " +
       "magnetic heading, true heading, heading accuracty\n";
 
@@ -289,20 +230,24 @@ export class DeviceMotionPage {
   }
 
   private writeLog(): void {
+    let sensor_data = this.sensors.data();
+    if (!sensor_data) return;
+
     let data = this.recordForm.value.tripType + ", " +
-               this.pos.coords.latitude + "," + 
-               this.pos.coords.longitude + "," +
-               this.pos.coords.altitude + "," +
-               this.pos.coords.accuracy + "," +
-               this.pos.coords.altitudeAccuracy + "," +
-               this.pos.coords.heading + "," +
-               this.pos.coords.speed + "," +
-               this.acceleration.x + "," +
-               this.acceleration.y + "," +
-               this.acceleration.z + "," +
-               this.compass.magneticHeading + "," +
-               this.compass.trueHeading + "," +
-               this.compass.headingAccuracy + "\n";
+               Date.now() + "," +
+               sensor_data.geolocation.coords.latitude + "," + 
+               sensor_data.geolocation.coords.longitude + "," +
+               sensor_data.geolocation.coords.altitude + "," +
+               sensor_data.geolocation.coords.accuracy + "," +
+               sensor_data.geolocation.coords.altitudeAccuracy + "," +
+               sensor_data.geolocation.coords.heading + "," +
+               sensor_data.geolocation.coords.speed + "," +
+               sensor_data.acceleration.x + "," +
+               sensor_data.acceleration.y + "," +
+               sensor_data.acceleration.z + "," +
+               sensor_data.compass.magneticHeading + "," +
+               sensor_data.compass.trueHeading + "," +
+               sensor_data.compass.headingAccuracy + "\n";
 
     File.writeFile(this.fs, this.fileName, data, {append: true})
       .then(
@@ -317,9 +262,9 @@ export class DeviceMotionPage {
   }
 
   ngOnDestroy() {
-    if (this.watchGeolocation) this.stopGeolocation(this.watchGeolocation);
-    if (this.watchAcceleration) this.stopAcceleration(this.watchAcceleration);
-    if (this.watchCompass) this.stopCompass(this.watchCompass);
+    this.sensors.stopGeolocation();
+    this.sensors.stopAcceleration();
+    this.sensors.stopCompass();
   }
 
 }

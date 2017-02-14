@@ -1,13 +1,14 @@
-import {NgModule} from "@angular/core";
-import {IonicApp, IonicModule} from "ionic-angular";
-import {MyApp} from "./app.component";
+import { NgModule } from "@angular/core";
+import { IonicApp, IonicModule } from "ionic-angular";
+import { MyApp } from "./app.component";
 import {
   CognitoUtil,
   UserLoginService,
   UserParametersService,
   UserRegistrationService
 } from "../providers/cognito.service";
-import {AwsUtil} from "../providers/aws.service";
+import { AwsUtil } from "../providers/aws.service";
+import { Sensors } from "../providers/sensors.service";
 import {
   LoginComponent,
   LogoutComponent,
@@ -17,10 +18,10 @@ import {
   ForgotPasswordStep1Component,
   ForgotPasswordStep2Component
 } from "../pages/auth/auth";
-import {ControlPanelComponent} from "../pages/controlpanel/controlpanel";
-import {Storage} from "@ionic/storage";
+import { ControlPanelComponent } from "../pages/controlpanel/controlpanel";
+import { Storage } from "@ionic/storage";
 import { DeviceMotionPage } from '../pages/device-motion/device-motion';
-import {EventsService} from "../providers/events.service";
+import { EventsService } from "../providers/events.service";
 
 @NgModule({
   declarations: [
@@ -57,7 +58,8 @@ import {EventsService} from "../providers/events.service";
     UserParametersService,
     UserRegistrationService,
     Storage,
-    EventsService]
+    EventsService,
+    Sensors]
 })
 
 export class AppModule {
