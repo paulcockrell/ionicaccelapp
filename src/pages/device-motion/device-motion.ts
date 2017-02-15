@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { Platform, ToastController } from 'ionic-angular';
 import { AwsUtil } from "../../providers/aws.service";
 import { Sensors, IDataObj } from "../../providers/sensors.service";
+import { LocalNotifications } from 'ionic-native';
 
 declare var cordova: any;
 
@@ -132,6 +133,17 @@ export class DeviceMotionPage {
 
       this.awsUtil.uploadFile(this.recordForm.value.tripType, this.data.join(""), () => {
         this.showToast("File uploaded to S3");
+
+        // Schedule a single notification
+        // This is really a functionality test, we will use this later
+        // when the app is running live and we determine the users motions changes
+        // i.e stationairy->walking->driving etc
+        LocalNotifications.schedule({
+          id: 1,
+          text: 'S3 upload completed',
+          sound: this.platform.is('android') ? 'file://sound.mp3': 'file://beep.caf',
+          data: { secret: 1234 }
+        });
       });
     }
     else {

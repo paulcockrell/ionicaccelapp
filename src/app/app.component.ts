@@ -1,9 +1,9 @@
-import {Component, ViewChild} from "@angular/core";
-import {Events, NavController, Platform, MenuController} from "ionic-angular";
-import {Splashscreen} from "ionic-native";
-import {LoginComponent, LogoutComponent} from "../pages/auth/auth";
-import {AwsUtil} from "../providers/aws.service";
-import {ControlPanelComponent} from "../pages/controlpanel/controlpanel";
+import { Component, ViewChild } from "@angular/core";
+import { Events, NavController, Platform, MenuController } from "ionic-angular";
+import { Splashscreen } from "ionic-native";
+import { LoginComponent, LogoutComponent } from "../pages/auth/auth";
+import { AwsUtil } from "../providers/aws.service";
+import { HomePage } from "../pages/home/home";
 import { DeviceMotionPage } from '../pages/device-motion/device-motion';
 
 
@@ -13,13 +13,10 @@ import { DeviceMotionPage } from '../pages/device-motion/device-motion';
 export class MyApp {
   @ViewChild(NavController) navCtrl;
   public loginPage = LoginComponent;
-  public homePage = ControlPanelComponent;
+  public homePage = HomePage;
   public logoutPage = LogoutComponent;
-  public settingsPage = ControlPanelComponent;
   public deviceMotionPage = DeviceMotionPage;
-
   public rootPage:any;
-
 
   constructor(public platform:Platform,
               public menu:MenuController,

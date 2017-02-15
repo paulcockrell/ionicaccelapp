@@ -18,7 +18,7 @@ import {
   ForgotPasswordStep1Component,
   ForgotPasswordStep2Component
 } from "../pages/auth/auth";
-import { ControlPanelComponent } from "../pages/controlpanel/controlpanel";
+import { HomePage } from "../pages/home/home";
 import { Storage } from "@ionic/storage";
 import { DeviceMotionPage } from '../pages/device-motion/device-motion';
 import { EventsService } from "../providers/events.service";
@@ -34,7 +34,7 @@ import { EventsService } from "../providers/events.service";
     ForgotPasswordStep1Component,
     ForgotPasswordStep2Component,
     DeviceMotionPage,
-    ControlPanelComponent
+    HomePage
   ],
   imports: [
     IonicModule.forRoot(MyApp)
@@ -50,7 +50,7 @@ import { EventsService } from "../providers/events.service";
     ForgotPasswordStep1Component,
     ForgotPasswordStep2Component,
     DeviceMotionPage,
-    ControlPanelComponent
+    HomePage
   ],
   providers: [CognitoUtil,
     AwsUtil,

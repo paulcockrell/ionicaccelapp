@@ -44,7 +44,10 @@
     "cordova-plugin-compat",
     "cordova-plugin-device-motion",
     "cordova-plugin-file",
-    "cordova-plugin-device-orientation"
+    "cordova-plugin-device-orientation",
+    "cordova-plugin-gyroscope",
+    "de.appplant.cordova.plugin.local-notification",
+    "cordova-plugin-app-event"
   ],
   "cordovaPlatforms": [
     {

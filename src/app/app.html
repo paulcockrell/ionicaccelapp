@@ -25,21 +25,10 @@
 
 <!-- Logged in menu -->
 <ion-menu id="loggedInMenu" [content]="content">
-  <ion-toolbar>
-    <ion-title>Pages</ion-title>
-  </ion-toolbar>
   <ion-content>
-    <ion-list>
-      <ion-list-header>
-        Account
-      </ion-list-header>
-      <button ion-item (click)="openPage(deviceMotionPage)">
-        <ion-icon item-left name="home"></ion-icon>
-        Device Motion
-      </button>
-
-    </ion-list>
-
+    <ion-toolbar>
+      <ion-title>Pages</ion-title>
+    </ion-toolbar>
     <ion-list>
       <ion-list-header>
         Navigation
@@ -48,14 +37,20 @@
         <ion-icon item-left name="home"></ion-icon>
         Home
       </button>
-
+      <button ion-item (click)="openPage(deviceMotionPage)">
+        <ion-icon item-left name="locate"></ion-icon>
+        Device Motion
+      </button>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>
+        Actions
+      </ion-list-header>
       <button ion-item (click)="openPage(logoutPage)">
         <ion-icon item-left name="log-out"></ion-icon>
         Logout
       </button>
-
     </ion-list>
-
   </ion-content>
 </ion-menu>
 
