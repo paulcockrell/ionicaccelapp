@@ -104,6 +104,9 @@ export class AwsUtil {
 
   uploadFile(file_prefix: string, data: string, cb: any): void {
     console.log("in uploadFile()");
+    // Following is a hack to make sure S3 uploads always work
+    // http://stackoverflow.com/questions/37259824/user-pools-for-amazon-cognito-credentialserror-missing-credentials-in-config
+    AWSCognito.config.update({accessKeyId: 'anything', secretAccessKey: 'anything'})
     let bucketName = _S3_BUCKET_NAME;
     let remoteFileName = file_prefix + "-" + Date.now() + ".csv";
     let s3 = new AWS.S3({
