@@ -30,7 +30,8 @@ npm install
 ```
 
 ```
-# ionic state restore
+# Restore target devices and cordova packages
+ionic state restore
 ```
 
 ```
