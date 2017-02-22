@@ -24,6 +24,11 @@ npm install
 ```
 
 ```
+# Install Ionic and Cordova packages
+npm install -g ionic cordova
+```
+
+```
 # ionic state restore
 ```
 
@@ -31,6 +36,12 @@ npm install
 # Build & Run the app in dev mode
 ionic build android
 ionic run android --device
+```
+
+```
+# Build & Run the app in prod mode
+ionic build android
+ionic run android --prod --device
 ```
 
 ### AWS Setup
