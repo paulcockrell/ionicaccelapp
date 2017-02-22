@@ -18,14 +18,15 @@ Authenticates with AWS Cognito, records phone location and movement, and then up
 # Clone it from github
 git clone git@github.com:paulcockrell/ionicaccelapp.git
 ```
-```
-# Install the NPM and Bower packages
-npm install
-```
 
 ```
 # Install Ionic and Cordova packages
 npm install -g ionic cordova
+```
+
+```
+# Install the NPM and Bower packages
+npm install
 ```
 
 ```
