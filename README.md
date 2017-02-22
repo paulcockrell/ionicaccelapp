@@ -1,14 +1,11 @@
-##AWS Cognito with Ionic2 Quickstart
-
-### Updates
-10/14 -- Updated to Angular Final/Ionic RC0
-
-### What does this app do?
-Quickly start using AWS Cognito and Ionic2
+##Ionic 2 mobile sensor application
+Authenticates with AWS Cognito, records phone location and movement, and then uploads data in CSV form to S3 
 
 ### Tech Stack
 #### Required Tools
 * [npm](https://www.npmjs.com/)
+* [Android SDK]
+* [adb]
 
 #### Frameworks
 * [AWS JavaScript SDK](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/browser-intro.html)
@@ -19,15 +16,21 @@ Quickly start using AWS Cognito and Ionic2
 ### Getting the code
 ```
 # Clone it from github
-git clone --depth 1 git@github.com:vbudilov/aws-cognito-ionic2.git
+git clone git@github.com:paulcockrell/ionicaccelapp.git
 ```
 ```
 # Install the NPM and Bower packages
 npm install
 ```
+
+```
+# ionic state restore
+```
+
 ```
 # Build & Run the app in dev mode
-ionic build; ionic serve
+ionic build android
+ionic run android --device
 ```
 
 ### AWS Setup
@@ -40,6 +43,5 @@ does not work with the JavaScript SDK.
 the "Cognito" entry with your app details generated in step 1.
 
 ### Necessary changes
-By default, this app is using my user pool, which is defined in the ```app/services/properties.service.ts``` file. 
-Update the file with the appropriate user pool info that you want to use 
+Modify ```app/services/properties.service.ts``` file to reflect your own AWS specific settings
 
