@@ -18,19 +18,32 @@ Authenticates with AWS Cognito, records phone location and movement, and then up
 # Clone it from github
 git clone git@github.com:paulcockrell/ionicaccelapp.git
 ```
+
+```
+# Install Ionic and Cordova packages
+npm install -g ionic cordova
+```
+
 ```
 # Install the NPM and Bower packages
 npm install
 ```
 
 ```
-# ionic state restore
+# Restore target devices and cordova packages
+ionic state restore
 ```
 
 ```
 # Build & Run the app in dev mode
 ionic build android
 ionic run android --device
+```
+
+```
+# Build & Run the app in prod mode
+ionic build android
+ionic run android --prod --device
 ```
 
 ### AWS Setup
